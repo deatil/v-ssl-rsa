@@ -11,6 +11,7 @@ pub fn print_openssl_error() {
     }
 }
 
+// msg get hash by openssl mdname string
 pub fn hash_msg(msg []u8, hash_name string) ![]u8 {
 	return calc_digest_with_mdname(msg, hash_name)
 }
@@ -67,7 +68,7 @@ fn get_md_with_mdname(name string) !&C.EVP_MD {
 	}
 
 	libctx := C.EVP_PKEY_CTX_get0_libctx(pctx)
-	md := C.EVP_MD_fetch(libctx, name.bytes().data, &[]u8{})
+	md := C.EVP_MD_fetch(libctx, name.bytes().data, voidptr(0))
 
 	return md
 }

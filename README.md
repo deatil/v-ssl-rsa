@@ -6,6 +6,7 @@ A RSA library base on openssl for vlang.
 ### Env
 
  - vlang >= 0.5.2
+ - OpenSSL >= 3.2.4
 
 
 ### Adding v-ssl-rsa as a dependency
@@ -97,7 +98,9 @@ pub:
 	salt_leng int = -1
 	hash_name string
 }
+~~~
 
+~~~v
 sign_pss(priv PrivateKey, digest []u8, opts PSSOptions) ![]u8
 ~~~
 

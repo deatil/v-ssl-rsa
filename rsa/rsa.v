@@ -11,20 +11,17 @@ pub struct PrivateKey {
 	evpkey &C.EVP_PKEY
 }
 
-// PrivateKey.new creates a new key pair. By default, it would create a prime256v1 based key.
+// PrivateKey.new creates a new key pair.
 // Dont forget to call `.free()` after finish with your key.
 pub fn PrivateKey.new(bits int, primes int) !PrivateKey {
-	evpkey := C.EVP_PKEY_new()
 	pctx := C.EVP_PKEY_CTX_new_id(nid_evp_pkey_rsa, 0)
 	if pctx == 0 {
-		C.EVP_PKEY_free(evpkey)
 		C.EVP_PKEY_CTX_free(pctx)
 		return error('C.EVP_PKEY_CTX_new_id failed')
 	}
 
 	nt := C.EVP_PKEY_keygen_init(pctx)
 	if nt <= 0 {
-		C.EVP_PKEY_free(evpkey)
 		C.EVP_PKEY_CTX_free(pctx)
 		return error('EVP_PKEY_keygen_init failed')
 	}
@@ -32,7 +29,8 @@ pub fn PrivateKey.new(bits int, primes int) !PrivateKey {
 	C.EVP_PKEY_CTX_set_rsa_keygen_bits(pctx, bits)
 	C.EVP_PKEY_CTX_set_rsa_keygen_primes(pctx, primes)
 
-	// generates keypair
+	evpkey := C.EVP_PKEY_new()
+
 	nr := C.EVP_PKEY_keygen(pctx, &evpkey)
 	if nr <= 0 {
 		C.EVP_PKEY_free(evpkey)
@@ -40,13 +38,12 @@ pub fn PrivateKey.new(bits int, primes int) !PrivateKey {
 		return error('EVP_PKEY_keygen failed')
 	}
 
-	// Cleans up the context
 	C.EVP_PKEY_CTX_free(pctx)
-	// when using default this function, its using underlying curve key size
-	// and discarded opt.fixed_size flag when its not set.
+
 	priv_key := PrivateKey{
 		evpkey: evpkey
 	}
+
 	return priv_key
 }
 

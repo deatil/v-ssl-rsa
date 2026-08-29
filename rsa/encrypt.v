@@ -20,7 +20,7 @@ fn encrypt(key &C.EVP_PKEY, msg []u8) ![]u8 {
 	}
 
 	outlen := i32(0)
-	do := C.EVP_PKEY_encrypt(ctx, &[]u8{}, &outlen, msg.data, msg.len)
+	do := C.EVP_PKEY_encrypt(ctx, voidptr(0), &outlen, msg.data, msg.len)
 	if do <= 0 {
 		C.EVP_PKEY_CTX_free(ctx)
 		return error('EVP_PKEY_encrypt fails to get outlen')
@@ -34,9 +34,14 @@ fn encrypt(key &C.EVP_PKEY, msg []u8) ![]u8 {
 		return error('EVP_PKEY_encrypt fails to encrypt message')
 	}
 
+	out_data := out[0..outlen].clone()
+	unsafe {
+		out.free()
+	}
+
 	C.EVP_PKEY_CTX_free(ctx)
 
-	return out
+	return out_data
 }
 
 fn decrypt(key &C.EVP_PKEY, ciphertext []u8) ![]u8 {
@@ -58,26 +63,28 @@ fn decrypt(key &C.EVP_PKEY, ciphertext []u8) ![]u8 {
 		return error('EVP_PKEY_CTX_set_rsa_padding fails')
 	}
 
-	outlen := i32(C.EVP_PKEY_size(key))
-	do := C.EVP_PKEY_decrypt(ctx, &[]u8{}, &outlen, ciphertext.data, ciphertext.len)
+	outlen := i32(0)
+	do := C.EVP_PKEY_decrypt(ctx, voidptr(0), &outlen, ciphertext.data, ciphertext.len)
 	if do <= 0 {
 		C.EVP_PKEY_CTX_free(ctx)
 		return error('EVP_PKEY_decrypt fails to get outlen')
 	}
 
-	mut outlen2 := i32(C.EVP_PKEY_size(key))
-	if outlen2 < outlen {
-		outlen2 = outlen
-	}
 	out := []u8{len: outlen}
-	res := C.EVP_PKEY_decrypt(ctx, out.data, &outlen2, ciphertext.data, ciphertext.len)
+	res := C.EVP_PKEY_decrypt(ctx, out.data, &outlen, ciphertext.data, ciphertext.len)
 	if res <= 0 {
 		C.EVP_PKEY_CTX_free(ctx)
 		return error('EVP_PKEY_decrypt fails to decrypt ciphertext')
 	}
 
+	out_data := out[0..outlen].clone()
+	unsafe {
+		out.free()
+	}
+
 	C.EVP_PKEY_CTX_free(ctx)
-	return out
+
+	return out_data
 }
 
 fn encrypt_for_oaep(key &C.EVP_PKEY, hash_name string, mgf_hash_name string, msg []u8, label []u8) ![]u8 {
@@ -121,7 +128,7 @@ fn encrypt_for_oaep(key &C.EVP_PKEY, hash_name string, mgf_hash_name string, msg
 	}
 
 	outlen := i32(0)
-	do := C.EVP_PKEY_encrypt(ctx, &[]u8{}, &outlen, msg.data, msg.len)
+	do := C.EVP_PKEY_encrypt(ctx, voidptr(0), &outlen, msg.data, msg.len)
 	if do <= 0 {
 		C.EVP_PKEY_CTX_free(ctx)
 		return error('EVP_PKEY_encrypt fails to get outlen')
@@ -134,8 +141,14 @@ fn encrypt_for_oaep(key &C.EVP_PKEY, hash_name string, mgf_hash_name string, msg
 		return error('EVP_PKEY_encrypt fails to encrypt message')
 	}
 
+	out_data := out[0..outlen].clone()
+	unsafe {
+		out.free()
+	}
+
 	C.EVP_PKEY_CTX_free(ctx)
-	return out
+
+	return out_data
 }
 
 fn decrypt_for_oaep(key &C.EVP_PKEY, hash_name string, mgf_hash_name string, ciphertext []u8, label []u8) ![]u8 {
@@ -178,25 +191,27 @@ fn decrypt_for_oaep(key &C.EVP_PKEY, hash_name string, mgf_hash_name string, cip
 		return error('EVP_PKEY_CTX_set0_rsa_oaep_label fails')
 	}
 
-	outlen := i32(C.EVP_PKEY_size(key))
-	do := C.EVP_PKEY_decrypt(ctx, &[]u8{}, &outlen, ciphertext.data, ciphertext.len)
+	outlen := i32(0)
+	do := C.EVP_PKEY_decrypt(ctx, voidptr(0), &outlen, ciphertext.data, ciphertext.len)
 	if do <= 0 {
 		C.EVP_PKEY_CTX_free(ctx)
 		return error('EVP_PKEY_decrypt fails to get outlen')
 	}
 
-	mut outlen2 := i32(C.EVP_PKEY_size(key))
-	if outlen2 < outlen {
-		outlen2 = outlen
-	}
 	out := []u8{len: outlen}
-	res := C.EVP_PKEY_decrypt(ctx, out.data, &outlen2, ciphertext.data, ciphertext.len)
+	res := C.EVP_PKEY_decrypt(ctx, out.data, &outlen, ciphertext.data, ciphertext.len)
 	if res <= 0 {
 		C.EVP_PKEY_CTX_free(ctx)
 		return error('EVP_PKEY_decrypt fails to decrypt ciphertext')
 	}
 
+	out_data := out[0..outlen].clone()
+	unsafe {
+		out.free()
+	}
+
 	C.EVP_PKEY_CTX_free(ctx)
-	return out
+
+	return out_data
 }
 

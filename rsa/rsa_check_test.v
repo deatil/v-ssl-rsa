@@ -81,6 +81,21 @@ fn test_sign_pkcs1v15_check() {
 
 }
 
+fn test_sign_pkcs1v15_check2() {
+	prikey := get_private_key()!
+	pubkey := prikey.public()!
+
+	msg := 'message-data'.bytes()
+	digest := hash_msg(msg, "sha256")!
+
+	ciphertext := '25d14fe04e66c8da872bc54a80ddd3f36c5de3aa9540efb9475b74f62e1f4112ca22f679dbbb3d74a485facea7ea2efcf4404aa3c52418ec4c6c2e7592f868cb64d07f16576ccea344aeaaf6f365fa982bc83c6c9bd70564789e879ab8a4eba6a561a5f289a20453801f16fc79b2b676c0b23e6b530b673bc7a0aff8c4b4a8148e903e7afd6a871dfc70466b1a031068ae583f883de6c94e1d944b73c6cf87269c9bd14120ead9fca8360f5a247747f42d54935927b9dd0ad25821e5f3f2542b22267de397045bf7429f662020759629f71d12c7f91663bc856724685b67a1cd800f398e7378ed1747830bc94d5240d76f5538d505856a1138ebc613b34acdab'
+	sig := from_hex(ciphertext)!
+
+	veri := verify_pkcs1v15(pubkey, "sha256", digest, sig)
+	assert true == veri
+
+}
+
 fn test_decrypt_pkcs1v15_check() {
 	prikey := get_private_key()!
 
@@ -102,6 +117,25 @@ fn test_sign_pss_check() {
 	d.reset()
 	d.write(msg)!
 	digest := d.sum([])
+
+	opts := PSSOptions{
+		salt_leng: pss_salt_length_auto
+		hash_name: "sha384"
+	}
+
+	ciphertext := '301b1064b0ea6f8f3e4196459e5ccd0bfc77c61bdc62edb8c7287a5ae0944fde45374b8ff242916c0abf26df9bae70c933a37a89094753556f038c7d832bc755cb16f76e6e8c64b714f3efe584c76706123ffedd13926d79c2d6e6287ebc778cb1c4106cce481a654eda35e41a0a435291825cecfe9a3bff3c10a6b6108a1ad3c74e6b0a6129d980802ef47f5f96ef88863d629d7f57191da29a76d85a463cc9ee7f9df9efed535aea79a3da0ae38abb03712d65c6ebb4746c6396dc090f0ceb5b7ef989403a70e89768e52a4f08b7f3b205eefd1be4c45b6178756ca58858f9f1f8a06f5abe0cba640f3278656524872117f05159fb750b95a083c55e11207e'
+	sig := from_hex(ciphertext)!
+
+	veri := verify_pss(pubkey, digest, sig, opts)
+	assert true == veri
+}
+
+fn test_sign_pss_check2() {
+	prikey := get_private_key()!
+	pubkey := prikey.public()!
+
+	msg := 'message-data'.bytes()
+	digest := hash_msg(msg, "sha384")!
 
 	opts := PSSOptions{
 		salt_leng: pss_salt_length_auto

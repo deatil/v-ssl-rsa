@@ -36,9 +36,6 @@ module rsa
 #include <openssl/pem.h>
 #include <openssl/param_build.h>
 
-pub const C.RSA_F4 int
-pub const C.NID_rsa int 
-
 @[typedef]
 struct C.EVP_MD_CTX {}
 

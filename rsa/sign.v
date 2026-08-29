@@ -29,7 +29,7 @@ fn sign_digest(key &C.EVP_PKEY, mdname string, digest []u8) ![]u8 {
 	}
 
 	siglen := i32(0)
-	status = C.EVP_PKEY_sign(ctx, &[]u8{}, &siglen, digest.data, digest.len)
+	status = C.EVP_PKEY_sign(ctx, voidptr(0), &siglen, digest.data, digest.len)
 	if status <= 0 {
 		C.EVP_PKEY_CTX_free(ctx)
 		return error('EVP_PKEY_sign fails to get siglen')
@@ -43,9 +43,14 @@ fn sign_digest(key &C.EVP_PKEY, mdname string, digest []u8) ![]u8 {
 		return error('EVP_PKEY_sign fails to sign message')
 	}
 
+	sig_data := sig[0..siglen].clone()
+	unsafe {
+		sig.free()
+	}
+
 	C.EVP_PKEY_CTX_free(ctx)
 
-	return sig
+	return sig_data
 }
 
 // verify_signature verifies the signature for the digest under the provided key.
@@ -82,6 +87,7 @@ fn verify_signature(key &C.EVP_PKEY, mdname string, sig []u8, digest []u8) bool 
 	}
 
 	C.EVP_PKEY_CTX_free(ctx)
+
 	return res == 1
 }
 
@@ -119,15 +125,14 @@ fn sign_digest_pss(key &C.EVP_PKEY, mdname string, saltlen int, digest []u8) ![]
 		return error('EVP_PKEY_CTX_set_signature_md fails')
 	}
 
-	siglen := i32(C.EVP_PKEY_size(key))
-	status = C.EVP_PKEY_sign(ctx, &[]u8{}, &siglen, digest.data, digest.len)
+	siglen := i32(0)
+	status = C.EVP_PKEY_sign(ctx, voidptr(0), &siglen, digest.data, digest.len)
 	if status <= 0 {
 		C.EVP_PKEY_CTX_free(ctx)
 		return error('EVP_PKEY_sign fails to get siglen')
 	}
 
 	sig := []u8{len: int(siglen)}
-
 	status = C.EVP_PKEY_sign(ctx, sig.data, &siglen, digest.data, digest.len)
 	if status <= 0 {
 		unsafe { sig.free() }
@@ -135,9 +140,14 @@ fn sign_digest_pss(key &C.EVP_PKEY, mdname string, saltlen int, digest []u8) ![]
 		return error('EVP_PKEY_sign fails to sign message')
 	}
 
+	sig_data := sig[0..siglen].clone()
+	unsafe {
+		sig.free()
+	}
+
 	C.EVP_PKEY_CTX_free(ctx)
 
-	return sig
+	return sig_data
 }
 
 // verify_signature verifies the signature for the digest under the provided key.
@@ -180,5 +190,6 @@ fn verify_signature_pss(key &C.EVP_PKEY, mdname string, saltlen int, sig []u8, d
 	}
 
 	C.EVP_PKEY_CTX_free(ctx)
+
 	return res == 1
 }
