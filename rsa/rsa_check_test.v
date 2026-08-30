@@ -46,6 +46,10 @@ CKuHRG+AP579dncdUnOMvfXOtkdM4vk0+hWASBQzM9xzVcztCa+koAugjVaLS9A+
 fn test_encrypt_oaep_with_opts_check() {
 	prikey := get_private_key()!
 
+	defer {
+		prikey.free()
+	}
+
 	label := 'label-test'.bytes()
 
 	opts := OAEPOptions{
@@ -66,6 +70,11 @@ fn test_sign_pkcs1v15_check() {
 	prikey := get_private_key()!
 	pubkey := prikey.public()!
 
+	defer {
+		prikey.free()
+		pubkey.free()
+	}
+
 	msg := 'message-data'.bytes()
 
 	mut d := sha256.new()
@@ -84,6 +93,11 @@ fn test_sign_pkcs1v15_check2() {
 	prikey := get_private_key()!
 	pubkey := prikey.public()!
 
+	defer {
+		prikey.free()
+		pubkey.free()
+	}
+
 	msg := 'message-data'.bytes()
 	digest := hash_msg(msg, 'sha256')!
 
@@ -97,6 +111,10 @@ fn test_sign_pkcs1v15_check2() {
 fn test_decrypt_pkcs1v15_check() {
 	prikey := get_private_key()!
 
+	defer {
+		prikey.free()
+	}
+
 	ciphertext := '61bfa956b12ee62fa056c819f2980e342d2bac5244dc4775b1fc849f7b56aa66fb01e0b95d9393070e04e82c8b71c5676542cbb981976954b710d7277655f70bcc132d71d5d1a861d549e531808e99f6511f41afda67cdd79b8063a0ad2273f3dee378d7c48d55e361acfa83c9d5de6a6be836d82f6d244a8f7959a5e918bcd3fdde570d2d9e9fc59f1b95a6bb71d81fee909250d40beca28441e35a2bc2ed1a383ea99ff4b39e373a5f422cb41d18bf6532e26010000a04631c26ad939e59622c29a76e966a43cae26d833c4a13e463ffb3bd9d9c37a278acee35be11a57bf6f0c033ac66907a46d841898c6fa98ef3f519b32e1db37c553e9177899773721e'
 	ct := from_hex(ciphertext)!
 
@@ -108,6 +126,11 @@ fn test_decrypt_pkcs1v15_check() {
 fn test_sign_pss_check() {
 	prikey := get_private_key()!
 	pubkey := prikey.public()!
+
+	defer {
+		prikey.free()
+		pubkey.free()
+	}
 
 	msg := 'message-data'.bytes()
 
@@ -132,6 +155,11 @@ fn test_sign_pss_check2() {
 	prikey := get_private_key()!
 	pubkey := prikey.public()!
 
+	defer {
+		prikey.free()
+		pubkey.free()
+	}
+
 	msg := 'message-data'.bytes()
 	digest := hash_msg(msg, 'sha384')!
 
@@ -150,6 +178,11 @@ fn test_sign_pss_check2() {
 fn test_sign_pss_check_fail() {
 	prikey := get_private_key()!
 	pubkey := prikey.public()!
+
+	defer {
+		prikey.free()
+		pubkey.free()
+	}
 
 	msg := 'message-data'.bytes()
 
@@ -172,6 +205,10 @@ fn test_sign_pss_check_fail() {
 
 fn test_encrypt_oaep_check() {
 	prikey := get_private_key()!
+
+	defer {
+		prikey.free()
+	}
 
 	label := 'label-test'.bytes()
 

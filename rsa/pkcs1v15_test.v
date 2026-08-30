@@ -5,6 +5,11 @@ import crypto.sha256
 fn test_sign_pkcs1v15() {
 	mut pubkey, prikey := generate_key(4096)!
 
+	defer {
+		prikey.free()
+		pubkey.free()
+	}
+
 	msg := 'test-message'.bytes()
 
 	mut d := sha256.new()
@@ -22,6 +27,11 @@ fn test_sign_pkcs1v15() {
 fn test_encrypt_pkcs1v15() {
 	mut pubkey, prikey := generate_key(4096)!
 
+	defer {
+		prikey.free()
+		pubkey.free()
+	}
+
 	msg := 'test-message'.bytes()
 
 	enmsg := encrypt_pkcs1v15(pubkey, msg)!
@@ -33,6 +43,11 @@ fn test_encrypt_pkcs1v15() {
 
 fn use_test_encrypt_pkcs1v15(bits int) ! {
 	mut pubkey, prikey := generate_key(bits)!
+
+	defer {
+		prikey.free()
+		pubkey.free()
+	}
 
 	msg := 'test-message'.bytes()
 

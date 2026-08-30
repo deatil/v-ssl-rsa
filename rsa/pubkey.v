@@ -170,7 +170,6 @@ pub fn make_privkey_pkcs1_pem(prikey PrivateKey) !string {
 		C.memcpy(&pem_bytes[0], buf, n)
 		C.OPENSSL_free(buf)
 	}
-
 	return encode_pem('RSA PRIVATE KEY', pem_bytes)
 }
 
@@ -188,7 +187,6 @@ pub fn make_pubkey_pkcs1_pem(pubkey PublicKey) !string {
 		C.memcpy(&pem_bytes[0], buf, n)
 		C.OPENSSL_free(buf)
 	}
-
 	return encode_pem('RSA PUBLIC KEY', pem_bytes)
 }
 

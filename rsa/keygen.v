@@ -2,7 +2,7 @@ module rsa
 
 // generate_key generates an RSA keypair of the given bit size.
 pub fn generate_key(bits int) !(PublicKey, PrivateKey) {
-	return generate_multi_prime_key(2, bits)
+	return generate_multi_prime_key(bits, 2)
 }
 
 // generate_multi_prime_key generates a multi-prime RSA keypair of the given bit
@@ -11,7 +11,7 @@ pub fn generate_key(bits int) !(PublicKey, PrivateKey) {
 // the private keys are not. Thus it may not be possible to export multi-prime
 // private keys in certain formats or to subsequently import them into other
 // code.
-pub fn generate_multi_prime_key(primes int, bits int) !(PublicKey, PrivateKey) {
+pub fn generate_multi_prime_key(bits int, primes int) !(PublicKey, PrivateKey) {
 	pv := PrivateKey.new(bits, primes)!
 	pb := pv.public()!
 

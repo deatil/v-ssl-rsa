@@ -40,6 +40,11 @@ wRipr3nUTuxyGohBTSmjJ2usSeQXHI3bODIRe1AuTyHceAbewn8b462yEWKARdpd
 	prikey := privkey_from_string(prikey_pem)!
 	pubkey := pubkey_from_string(pubkey_pem)!
 
+	defer {
+		prikey.free()
+		pubkey.free()
+	}
+
 	msg := 'test-message'.bytes()
 
 	enmsg := encrypt(pubkey.evpkey, msg)!
@@ -89,6 +94,11 @@ wRipr3nUTuxyGohBTSmjJ2usSeQXHI3bODIRe1AuTyHceAbewn8b462yEWKARdpd
 	prikey := privkey_from_string(prikey_pem)!
 	pubkey := pubkey_from_string(pubkey_pem)!
 
+	defer {
+		prikey.free()
+		pubkey.free()
+	}
+
 	msg := 'test-message'.bytes()
 	label := 'test-label'.bytes()
 
@@ -101,6 +111,11 @@ wRipr3nUTuxyGohBTSmjJ2usSeQXHI3bODIRe1AuTyHceAbewn8b462yEWKARdpd
 
 fn use_test_encrypt(bits int) ! {
 	mut pubkey, prikey := generate_key(bits)!
+
+	defer {
+		prikey.free()
+		pubkey.free()
+	}
 
 	msg := 'test-message'.bytes()
 
@@ -120,6 +135,11 @@ fn test_encrypt_with_bits() {
 
 fn use_test_encrypt_for_oaep(bits int) ! {
 	mut pubkey, prikey := generate_key(bits)!
+
+	defer {
+		prikey.free()
+		pubkey.free()
+	}
 
 	msg := 'test-message'.bytes()
 	label := 'test-label'.bytes()

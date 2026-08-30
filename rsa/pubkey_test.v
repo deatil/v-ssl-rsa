@@ -42,6 +42,11 @@ wRipr3nUTuxyGohBTSmjJ2usSeQXHI3bODIRe1AuTyHceAbewn8b462yEWKARdpd
 	prikey := privkey_from_string(prikey_pem)!
 	pubkey := pubkey_from_string(pubkey_pem)!
 
+	defer {
+		prikey.free()
+		pubkey.free()
+	}
+
 	msg := 'test-message'.bytes()
 
 	mut d := sha256.new()
@@ -59,16 +64,25 @@ wRipr3nUTuxyGohBTSmjJ2usSeQXHI3bODIRe1AuTyHceAbewn8b462yEWKARdpd
 fn test_make_privkey_pem() {
 	pubkey, prikey := generate_key(2048)!
 
+	defer {
+		prikey.free()
+		pubkey.free()
+	}
+
 	prikey_pem := make_privkey_pem(prikey)!
 	assert prikey_pem.len > 0
 
 	pubkey_pem := make_pubkey_pem(pubkey)!
 	assert pubkey_pem.len > 0
-	// assert "0000" == pubkey_pem
 }
 
 fn test_make_privkey_pkcs1_pem() {
 	pubkey, prikey := generate_key(2048)!
+
+	defer {
+		prikey.free()
+		pubkey.free()
+	}
 
 	prikey_pem := make_privkey_pkcs1_pem(prikey)!
 	assert prikey_pem.len > 0

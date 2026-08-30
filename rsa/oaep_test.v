@@ -3,6 +3,11 @@ module rsa
 fn use_test_encrypt_oaep(bits int) ! {
 	mut pubkey, prikey := generate_key(bits)!
 
+	defer {
+		prikey.free()
+		pubkey.free()
+	}
+
 	msg := 'test-message'.bytes()
 	label := 'test-label'.bytes()
 
@@ -22,6 +27,11 @@ fn test_encrypt_oaep_with_bits() {
 
 fn use_test_encrypt_oaep_with_opts(bits int) ! {
 	mut pubkey, prikey := generate_key(bits)!
+
+	defer {
+		prikey.free()
+		pubkey.free()
+	}
 
 	msg := 'test-message'.bytes()
 	label := 'test-label'.bytes()

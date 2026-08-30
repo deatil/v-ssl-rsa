@@ -5,6 +5,11 @@ import crypto.sha256
 fn test_sign_pss() {
 	mut pubkey, prikey := generate_key(2048)!
 
+	defer {
+		prikey.free()
+		pubkey.free()
+	}
+
 	mut msg := 'test-message'.bytes()
 
 	mut d := sha256.new()

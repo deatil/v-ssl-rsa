@@ -5,6 +5,11 @@ import crypto.sha256
 fn test_sign_digest() {
 	mut pubkey, prikey := generate_key(4096)!
 
+	defer {
+		prikey.free()
+		pubkey.free()
+	}
+
 	msg := 'test-message'.bytes()
 
 	mut d := sha256.new()
@@ -21,6 +26,11 @@ fn test_sign_digest() {
 
 fn test_sign_digest_pss() {
 	mut pubkey, prikey := generate_key(2048)!
+
+	defer {
+		prikey.free()
+		pubkey.free()
+	}
 
 	mut msg := 'test-message'.bytes()
 

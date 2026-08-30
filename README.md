@@ -40,6 +40,11 @@ import deatil.sslrsa.rsa
 fn main() {
 	pubkey, prikey := rsa.generate_key(2048)!
 
+	defer {
+		prikey.free()
+		pubkey.free()
+	}
+
 	msg := 'test-message'.bytes()
 	digest := rsa.hash_msg(msg, 'sha256')!
 
