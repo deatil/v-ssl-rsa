@@ -19,4 +19,3 @@ pub fn sign_pss(priv PrivateKey, digest []u8, opts PSSOptions) ![]u8 {
 pub fn verify_pss(pubkey PublicKey, digest []u8, sig []u8, opts PSSOptions) bool {
 	return verify_signature_pss(pubkey.evpkey, opts.hash_name, opts.salt_leng, sig, digest)
 }
-

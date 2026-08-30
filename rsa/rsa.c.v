@@ -36,33 +36,25 @@ module rsa
 #include <openssl/pem.h>
 #include <openssl/param_build.h>
 
-@[typedef]
-struct C.EVP_MD_CTX {}
+fn C.ERR_get_error() u64
+fn C.ERR_error_string(u64, &u8) &u8
+fn C.ERR_lib_error_string(u64) &u8
 
-@[typedef]
-struct C.BN_CTX {}
-
-@[typedef]
-struct C.BN_MONT_CTX {}
-
-@[typedef]
-struct C.BN_GENCB {}
+fn C.OPENSSL_memdup(str &u8, siz int) &u8
+fn C.OPENSSL_free(addr voidptr)
 
 @[typedef]
 struct C.ENGINE {}
 
 @[typedef]
-struct C.EVP_CIPHER {}
-
-@[typedef]
 struct C.EVP_PKEY_CTX {}
 
-fn C.EVP_PKEY_CTX_set_rsa_keygen_bits(key &C.EVP_PKEY_CTX, bits int) i32
-fn C.EVP_PKEY_CTX_set_rsa_keygen_primes(key &C.EVP_PKEY_CTX, primes int) i32
 fn C.EVP_PKEY_keygen_init(ctx &C.EVP_PKEY_CTX) i32
 fn C.EVP_PKEY_CTX_new(&C.EVP_PKEY, &C.ENGINE) &C.EVP_PKEY_CTX
 fn C.EVP_PKEY_CTX_new_id(id int, &C.ENGINE) &C.EVP_PKEY_CTX
 fn C.EVP_PKEY_keygen(ctx &C.EVP_PKEY_CTX, ppkey &&C.EVP_PKEY) i32
+fn C.EVP_PKEY_CTX_set_rsa_keygen_bits(key &C.EVP_PKEY_CTX, bits int) i32
+fn C.EVP_PKEY_CTX_set_rsa_keygen_primes(key &C.EVP_PKEY_CTX, primes int) i32
 fn C.EVP_PKEY_CTX_set_rsa_padding(ctx &C.EVP_PKEY_CTX, pad_mode int) i32
 fn C.EVP_PKEY_CTX_set_rsa_pss_saltlen(ctx &C.EVP_PKEY_CTX, saltlen int) i32
 fn C.EVP_PKEY_CTX_set_signature_md(ctx &C.EVP_PKEY_CTX, md &C.EVP_MD) i32
@@ -74,12 +66,6 @@ fn C.EVP_PKEY_CTX_set0_rsa_oaep_label(key &C.EVP_PKEY_CTX, label &u8, llen i32) 
 struct C.BIGNUM {}
 
 fn C.BN_new() &C.BIGNUM
-fn C.BN_num_bits(a &C.BIGNUM) i32
-fn C.BN_bn2bin(a &C.BIGNUM, to &u8) i32
-fn C.BN_bn2binpad(a &C.BIGNUM, to &u8, tolen i32) i32
-fn C.BN_cmp(a &C.BIGNUM, b &C.BIGNUM) i32
-fn C.BN_bin2bn(s &u8, len i32, ret &C.BIGNUM) &C.BIGNUM
-fn C.BN_set_word(a &C.BIGNUM, tolen i32)
 fn C.BN_free(a &C.BIGNUM)
 
 @[typedef]
@@ -104,6 +90,17 @@ fn C.EVP_PKEY_sign_init(ctx &C.EVP_PKEY_CTX) i32
 fn C.EVP_PKEY_verify_init(ctx &C.EVP_PKEY_CTX) i32
 fn C.EVP_PKEY_verify(ctx &C.EVP_PKEY_CTX, sig &u8, siglen i32, tbs &u8, tbslen i32) i32
 
+fn C.EVP_PKEY_encrypt_init(key &C.EVP_PKEY_CTX) i32
+fn C.EVP_PKEY_encrypt(ctx &C.EVP_PKEY_CTX, out &u8, outlen &i32, ins &u8, inslen i32) i32
+fn C.EVP_PKEY_decrypt_init(key &C.EVP_PKEY_CTX) i32
+fn C.EVP_PKEY_decrypt(ctx &C.EVP_PKEY_CTX, out &u8, outlen &i32, ins &u8, inslen i32) i32
+
+@[typedef]
+struct C.EVP_MD_CTX {}
+
+fn C.EVP_MD_CTX_new() &C.EVP_MD_CTX
+fn C.EVP_MD_CTX_free(ctx &C.EVP_MD_CTX)
+
 // single shoot digest signing (verifying) routine
 fn C.EVP_DigestSign(ctx &C.EVP_MD_CTX, sig &u8, siglen &i32, tbs &u8, tbslen i32) i32
 fn C.EVP_DigestVerify(ctx &C.EVP_MD_CTX, sig &u8, siglen i32, tbs &u8, tbslen i32) i32
@@ -121,25 +118,18 @@ fn C.EVP_DigestVerifyInit(ctx &C.EVP_MD_CTX, pctx &&C.EVP_PKEY_CTX, tipe &C.EVP_
 fn C.EVP_DigestVerifyUpdate(ctx &C.EVP_MD_CTX, d voidptr, cnt i32) i32
 fn C.EVP_DigestVerifyFinal(ctx &C.EVP_MD_CTX, sig &u8, siglen i32) i32
 
-fn C.EVP_MD_CTX_new() &C.EVP_MD_CTX
-fn C.EVP_MD_CTX_free(ctx &C.EVP_MD_CTX)
-
-fn C.EVP_PKEY_encrypt_init(key &C.EVP_PKEY_CTX) i32
-fn C.EVP_PKEY_encrypt(ctx &C.EVP_PKEY_CTX, out &u8, outlen &i32, ins &u8, inslen i32) i32
-fn C.EVP_PKEY_decrypt_init(key &C.EVP_PKEY_CTX) i32
-fn C.EVP_PKEY_decrypt(ctx &C.EVP_PKEY_CTX, out &u8, outlen &i32, ins &u8, inslen i32) i32
-
 @[typedef]
 struct C.EVP_MD {}
 
 fn C.EVP_MD_fetch(ctx &C.OSSL_LIB_CTX, algorithm &u8, properties &u8) &C.EVP_MD
 fn C.EVP_MD_get_size(md &C.EVP_MD) i32 // -1 failure
 
-fn C.OPENSSL_free(addr voidptr)
-
 // BIO input output declarations.
 @[typedef]
 struct C.BIO_METHOD {}
+
+@[typedef]
+struct C.EVP_CIPHER {}
 
 @[typedef]
 pub struct C.BIO {}
@@ -151,10 +141,10 @@ fn C.BIO_write(b &C.BIO, buf &u8, length i32) i32
 fn C.d2i_PUBKEY(k &&C.EVP_PKEY, pp &&u8, length u32) &C.EVP_PKEY
 fn C.i2d_PUBKEY_bio(bo &C.BIO, pkey &C.EVP_PKEY) i32
 fn C.d2i_PUBKEY_bio(bo &C.BIO, key &&C.EVP_PKEY) &C.EVP_PKEY
-fn C.PEM_read_bio_PrivateKey(bp &C.BIO, x &&C.EVP_PKEY, cb i32, u &voidptr) &C.EVP_PKEY
-fn C.PEM_read_bio_PUBKEY(bp &C.BIO, x &&C.EVP_PKEY, cb i32, u &voidptr) &C.EVP_PKEY
+fn C.PEM_read_bio_PrivateKey(bp &C.BIO, x &&C.EVP_PKEY, cb voidptr, u voidptr) &C.EVP_PKEY
+fn C.PEM_read_bio_PUBKEY(bp &C.BIO, x &&C.EVP_PKEY, cb voidptr, u voidptr) &C.EVP_PKEY
 fn C.PEM_write_bio_PUBKEY(bp &C.BIO, x &C.EVP_PKEY) i32
-fn C.PEM_write_bio_PrivateKey(out &C.BIO, x &C.EVP_PKEY, enc &C.EVP_CIPHER, kstr &u8, klen i32, cb &voidptr, u &voidptr) i32
+fn C.PEM_write_bio_PrivateKey(out &C.BIO, x &C.EVP_PKEY, enc &C.EVP_CIPHER, kstr &u8, klen i32, cb voidptr, u voidptr) i32
 fn C.i2d_PrivateKey(x &C.EVP_PKEY, data &&u8) i32
 fn C.i2d_PublicKey(x &C.EVP_PKEY, data &&u8) i32
 fn C.BIO_read(bp &C.BIO, data &u8, dlen i32) i32
@@ -164,10 +154,3 @@ fn C.BIO_pending(bp &C.BIO) i32
 pub struct C.OSSL_LIB_CTX {}
 
 fn C.EVP_PKEY_CTX_get0_libctx(ctx &C.EVP_PKEY_CTX) &C.OSSL_LIB_CTX
-
-fn C.ERR_get_error() u64
-fn C.ERR_error_string(u64, &u8) &u8
-fn C.ERR_lib_error_string(u64) &u8
-
-fn C.OPENSSL_memdup(str &u8, siz int) &u8
-

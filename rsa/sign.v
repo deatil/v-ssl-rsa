@@ -6,33 +6,35 @@ fn sign_digest(key &C.EVP_PKEY, mdname string, digest []u8) ![]u8 {
 	ctx := C.EVP_PKEY_CTX_new(key, 0)
 	if ctx == 0 {
 		C.EVP_PKEY_CTX_free(ctx)
-		return error('EVP_PKEY_CTX_new failed')
+		return rsa_error('EVP_PKEY_CTX_new failed')
 	}
 
-	sin := C.EVP_PKEY_sign_init(ctx)
-	if sin != 1 {
+	mut status := i32(0)
+
+	status = C.EVP_PKEY_sign_init(ctx)
+	if status != 1 {
 		C.EVP_PKEY_CTX_free(ctx)
-		return error('EVP_PKEY_sign_init failed')
+		return rsa_error('EVP_PKEY_sign_init failed')
 	}
 
-	mut status := C.EVP_PKEY_CTX_set_rsa_padding(ctx, C.RSA_PKCS1_PADDING)
+	status = C.EVP_PKEY_CTX_set_rsa_padding(ctx, C.RSA_PKCS1_PADDING)
 	if status <= 0 {
 		C.EVP_PKEY_CTX_free(ctx)
-		return error('EVP_PKEY_CTX_set_rsa_padding fails')
+		return rsa_error('EVP_PKEY_CTX_set_rsa_padding fails')
 	}
 
 	md := get_md_with_mdname(mdname)!
 	status = C.EVP_PKEY_CTX_set_signature_md(ctx, md)
 	if status <= 0 {
 		C.EVP_PKEY_CTX_free(ctx)
-		return error('EVP_PKEY_CTX_set_signature_md fails')
+		return rsa_error('EVP_PKEY_CTX_set_signature_md fails')
 	}
 
 	siglen := i32(0)
-	status = C.EVP_PKEY_sign(ctx, voidptr(0), &siglen, digest.data, digest.len)
+	status = C.EVP_PKEY_sign(ctx, unsafe { nil }, &siglen, digest.data, digest.len)
 	if status <= 0 {
 		C.EVP_PKEY_CTX_free(ctx)
-		return error('EVP_PKEY_sign fails to get siglen')
+		return rsa_error('EVP_PKEY_sign fails to get siglen')
 	}
 
 	sig := []u8{len: int(siglen)}
@@ -40,7 +42,7 @@ fn sign_digest(key &C.EVP_PKEY, mdname string, digest []u8) ![]u8 {
 	if status <= 0 {
 		unsafe { sig.free() }
 		C.EVP_PKEY_CTX_free(ctx)
-		return error('EVP_PKEY_sign fails to sign message')
+		return rsa_error('EVP_PKEY_sign fails to sign message')
 	}
 
 	sig_data := sig[0..siglen].clone()
@@ -61,13 +63,15 @@ fn verify_signature(key &C.EVP_PKEY, mdname string, sig []u8, digest []u8) bool 
 		return false
 	}
 
-	vinit := C.EVP_PKEY_verify_init(ctx)
-	if vinit != 1 {
+	mut status := i32(0)
+
+	status = C.EVP_PKEY_verify_init(ctx)
+	if status != 1 {
 		C.EVP_PKEY_CTX_free(ctx)
 		return false
 	}
 
-	mut status := C.EVP_PKEY_CTX_set_rsa_padding(ctx, C.RSA_PKCS1_PADDING)
+	status = C.EVP_PKEY_CTX_set_rsa_padding(ctx, C.RSA_PKCS1_PADDING)
 	if status <= 0 {
 		C.EVP_PKEY_CTX_free(ctx)
 		return false
@@ -97,39 +101,41 @@ fn sign_digest_pss(key &C.EVP_PKEY, mdname string, saltlen int, digest []u8) ![]
 	ctx := C.EVP_PKEY_CTX_new(key, 0)
 	if ctx == 0 {
 		C.EVP_PKEY_CTX_free(ctx)
-		return error('EVP_PKEY_CTX_new failed')
+		return rsa_error('EVP_PKEY_CTX_new failed')
 	}
 
-	sin := C.EVP_PKEY_sign_init(ctx)
-	if sin != 1 {
+	mut status := i32(0)
+
+	status = C.EVP_PKEY_sign_init(ctx)
+	if status != 1 {
 		C.EVP_PKEY_CTX_free(ctx)
-		return error('EVP_PKEY_sign_init failed')
+		return rsa_error('EVP_PKEY_sign_init failed')
 	}
 
-	mut status := C.EVP_PKEY_CTX_set_rsa_padding(ctx, C.RSA_PKCS1_PSS_PADDING)
+	status = C.EVP_PKEY_CTX_set_rsa_padding(ctx, C.RSA_PKCS1_PSS_PADDING)
 	if status <= 0 {
 		C.EVP_PKEY_CTX_free(ctx)
-		return error('EVP_PKEY_CTX_set_rsa_padding fails')
+		return rsa_error('EVP_PKEY_CTX_set_rsa_padding fails')
 	}
 
 	status = C.EVP_PKEY_CTX_set_rsa_pss_saltlen(ctx, saltlen)
 	if status <= 0 {
 		C.EVP_PKEY_CTX_free(ctx)
-		return error('EVP_PKEY_CTX_set_rsa_pss_saltlen fails')
+		return rsa_error('EVP_PKEY_CTX_set_rsa_pss_saltlen fails')
 	}
 
 	md := get_md_with_mdname(mdname)!
 	status = C.EVP_PKEY_CTX_set_signature_md(ctx, md)
 	if status <= 0 {
 		C.EVP_PKEY_CTX_free(ctx)
-		return error('EVP_PKEY_CTX_set_signature_md fails')
+		return rsa_error('EVP_PKEY_CTX_set_signature_md fails')
 	}
 
 	siglen := i32(0)
-	status = C.EVP_PKEY_sign(ctx, voidptr(0), &siglen, digest.data, digest.len)
+	status = C.EVP_PKEY_sign(ctx, unsafe { nil }, &siglen, digest.data, digest.len)
 	if status <= 0 {
 		C.EVP_PKEY_CTX_free(ctx)
-		return error('EVP_PKEY_sign fails to get siglen')
+		return rsa_error('EVP_PKEY_sign fails to get siglen')
 	}
 
 	sig := []u8{len: int(siglen)}
@@ -137,7 +143,7 @@ fn sign_digest_pss(key &C.EVP_PKEY, mdname string, saltlen int, digest []u8) ![]
 	if status <= 0 {
 		unsafe { sig.free() }
 		C.EVP_PKEY_CTX_free(ctx)
-		return error('EVP_PKEY_sign fails to sign message')
+		return rsa_error('EVP_PKEY_sign fails to sign message')
 	}
 
 	sig_data := sig[0..siglen].clone()
@@ -158,13 +164,15 @@ fn verify_signature_pss(key &C.EVP_PKEY, mdname string, saltlen int, sig []u8, d
 		return false
 	}
 
-	vinit := C.EVP_PKEY_verify_init(ctx)
-	if vinit != 1 {
+	mut status := i32(0)
+
+	status = C.EVP_PKEY_verify_init(ctx)
+	if status != 1 {
 		C.EVP_PKEY_CTX_free(ctx)
 		return false
 	}
 
-	mut status := C.EVP_PKEY_CTX_set_rsa_padding(ctx, C.RSA_PKCS1_PSS_PADDING)
+	status = C.EVP_PKEY_CTX_set_rsa_padding(ctx, C.RSA_PKCS1_PSS_PADDING)
 	if status <= 0 {
 		C.EVP_PKEY_CTX_free(ctx)
 		return false
@@ -176,7 +184,7 @@ fn verify_signature_pss(key &C.EVP_PKEY, mdname string, saltlen int, sig []u8, d
 		return false
 	}
 
-	md := get_md_with_mdname(mdname)  or { return false }
+	md := get_md_with_mdname(mdname) or { return false }
 	status = C.EVP_PKEY_CTX_set_signature_md(ctx, md)
 	if status <= 0 {
 		C.EVP_PKEY_CTX_free(ctx)

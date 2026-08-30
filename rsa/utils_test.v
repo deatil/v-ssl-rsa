@@ -10,7 +10,7 @@ fn test_calc_digest_with_mdname() {
 	d.write(msg)!
 	digest := d.sum([])
 
-	hashed := calc_digest_with_mdname(msg, "sha1")!
+	hashed := calc_digest_with_mdname(msg, 'sha1')!
 	assert hashed.len > 0
 	assert hashed.hex() == digest.hex()
 }
@@ -23,7 +23,7 @@ fn test_hash_msg() {
 	d.write(msg)!
 	digest := d.sum([])
 
-	hashed := hash_msg(msg, "sha1")!
+	hashed := hash_msg(msg, 'sha1')!
 	assert hashed.len > 0
 	assert hashed.hex() == digest.hex()
 }

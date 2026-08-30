@@ -5,7 +5,7 @@ A RSA library base on openssl for vlang.
 
 ### Env
 
- - vlang >= 0.5.2
+ - Vlang >= 0.5.2
  - OpenSSL >= 3.2.4
 
 
@@ -35,18 +35,13 @@ import deatil.sslrsa.rsa
 ~~~v
 module main
 
-import crypto.sha256
 import deatil.sslrsa.rsa
 
 fn main() {
 	pubkey, prikey := rsa.generate_key(2048)!
 
 	msg := 'test-message'.bytes()
-
-	mut d := sha256.new()
-	d.reset()
-	d.write(msg)!
-	digest := d.sum([])
+	digest := rsa.hash_msg(msg, 'sha256')!
 
 	signed := rsa.sign_pkcs1v15(prikey, "sha256", digest)!
     println("sign_pkcs1v15: ${signed}")
@@ -84,18 +79,18 @@ decrypt_pkcs1v15(priv PrivateKey, ciphertext []u8) ![]u8
 
 OAEP encrypt: 
 ~~~v
-encrypt_oaep(pubkey PublicKey, h string, msg []u8, label []u8) ![]u8
+encrypt_oaep(pubkey PublicKey, hash_name string, msg []u8, label []u8) ![]u8
 ~~~
 
 ~~~v
-decrypt_oaep(priv PrivateKey, h string, ciphertext []u8, label []u8) ![]u8
+decrypt_oaep(priv PrivateKey, hash_name string, ciphertext []u8, label []u8) ![]u8
 ~~~
 
 PSS sign: 
 ~~~v
 pub struct PSSOptions {
 pub:
-	salt_leng int = -1
+	salt_leng int
 	hash_name string
 }
 ~~~

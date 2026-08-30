@@ -12,12 +12,11 @@ fn test_sign_pkcs1v15() {
 	d.write(msg)!
 	digest := d.sum([])
 
-	sig := sign_pkcs1v15(prikey, "sha256", digest)!
+	sig := sign_pkcs1v15(prikey, 'sha256', digest)!
 	assert sig.len > 0
 
-	veri := verify_pkcs1v15(pubkey, "sha256", digest, sig)
+	veri := verify_pkcs1v15(pubkey, 'sha256', digest, sig)
 	assert true == veri
-
 }
 
 fn test_encrypt_pkcs1v15() {
@@ -30,10 +29,9 @@ fn test_encrypt_pkcs1v15() {
 
 	demsg := decrypt_pkcs1v15(prikey, enmsg)!
 	assert msg.bytestr() == demsg.bytestr()
-
 }
 
-fn use_test_encrypt_pkcs1v15(bits int)! {
+fn use_test_encrypt_pkcs1v15(bits int) ! {
 	mut pubkey, prikey := generate_key(bits)!
 
 	msg := 'test-message'.bytes()
@@ -43,7 +41,6 @@ fn use_test_encrypt_pkcs1v15(bits int)! {
 
 	demsg := decrypt_pkcs1v15(prikey, enmsg)!
 	assert msg.bytestr() == demsg.bytestr()
-
 }
 
 fn test_encrypt_pkcs1v15_with_bits() {
@@ -52,4 +49,3 @@ fn test_encrypt_pkcs1v15_with_bits() {
 	use_test_encrypt_pkcs1v15(2048)!
 	use_test_encrypt_pkcs1v15(4098)!
 }
-

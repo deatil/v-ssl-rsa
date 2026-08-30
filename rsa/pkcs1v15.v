@@ -22,4 +22,3 @@ pub fn encrypt_pkcs1v15(pubkey PublicKey, msg []u8) ![]u8 {
 pub fn decrypt_pkcs1v15(priv PrivateKey, ciphertext []u8) ![]u8 {
 	return decrypt(priv.evpkey, ciphertext)
 }
-

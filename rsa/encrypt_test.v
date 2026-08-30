@@ -1,7 +1,7 @@
 module rsa
 
 fn test_encrypt() {
-	prikey_pem := "-----BEGIN RSA PRIVATE KEY-----
+	prikey_pem := '-----BEGIN RSA PRIVATE KEY-----
 MIIEowIBAAKCAQEA4f5wg5l2hKsTeNem/V41fGnJm6gOdrj8ym3rFkEU/wT8RDtn
 SgFEZOQpHEgQ7JL38xUfU0Y3g6aYw9QT0hJ7mCpz9Er5qLaMXJwZxzHzAahlfA0i
 cqabvJOMvQtzD6uQv6wPEyZtDTWiQi9AXwBpHssPnpYGIn20ZZuNlX2BrClciHhC
@@ -27,15 +27,15 @@ mDgqkLECiOJW2NHP/j0McAkDLL4tysF8TLDO8gvuvzNC+WQ6drO2ThrypLVZQ+ry
 eBIPmwKBgEZxhqa0gVvHQG/7Od69KWj4eJP28kq13RhKay8JOoN0vPmspXJo1HY3
 CKuHRG+AP579dncdUnOMvfXOtkdM4vk0+hWASBQzM9xzVcztCa+koAugjVaLS9A+
 9uQoqEeVNTckxx0S2bYevRy7hGQmUJTyQm3j1zEUR5jpdbL83Fbq
------END RSA PRIVATE KEY-----"
-	pubkey_pem := "-----BEGIN RSA PUBLIC KEY-----
+-----END RSA PRIVATE KEY-----'
+	pubkey_pem := '-----BEGIN RSA PUBLIC KEY-----
 MIIBCgKCAQEA4f5wg5l2hKsTeNem/V41fGnJm6gOdrj8ym3rFkEU/wT8RDtnSgFE
 ZOQpHEgQ7JL38xUfU0Y3g6aYw9QT0hJ7mCpz9Er5qLaMXJwZxzHzAahlfA0icqab
 vJOMvQtzD6uQv6wPEyZtDTWiQi9AXwBpHssPnpYGIn20ZZuNlX2BrClciHhCPUII
 ZOQn/MmqTD31jSyjoQoV7MhhMTATKJx2XrHhR+1DcKJzQBSTAGnpYVaqpsARap+n
 wRipr3nUTuxyGohBTSmjJ2usSeQXHI3bODIRe1AuTyHceAbewn8b462yEWKARdpd
 9AjQW5SIVPfdsz5B6GlYQ5LdYKtznTuy7wIDAQAB
------END RSA PUBLIC KEY-----"
+-----END RSA PUBLIC KEY-----'
 
 	prikey := privkey_from_string(prikey_pem)!
 	pubkey := pubkey_from_string(pubkey_pem)!
@@ -47,11 +47,10 @@ wRipr3nUTuxyGohBTSmjJ2usSeQXHI3bODIRe1AuTyHceAbewn8b462yEWKARdpd
 
 	demsg := decrypt(prikey.evpkey, enmsg)!
 	assert msg.bytestr() == demsg.bytestr()
-
 }
 
 fn test_encrypt_for_oaep() {
-	prikey_pem := "-----BEGIN RSA PRIVATE KEY-----
+	prikey_pem := '-----BEGIN RSA PRIVATE KEY-----
 MIIEowIBAAKCAQEA4f5wg5l2hKsTeNem/V41fGnJm6gOdrj8ym3rFkEU/wT8RDtn
 SgFEZOQpHEgQ7JL38xUfU0Y3g6aYw9QT0hJ7mCpz9Er5qLaMXJwZxzHzAahlfA0i
 cqabvJOMvQtzD6uQv6wPEyZtDTWiQi9AXwBpHssPnpYGIn20ZZuNlX2BrClciHhC
@@ -77,15 +76,15 @@ mDgqkLECiOJW2NHP/j0McAkDLL4tysF8TLDO8gvuvzNC+WQ6drO2ThrypLVZQ+ry
 eBIPmwKBgEZxhqa0gVvHQG/7Od69KWj4eJP28kq13RhKay8JOoN0vPmspXJo1HY3
 CKuHRG+AP579dncdUnOMvfXOtkdM4vk0+hWASBQzM9xzVcztCa+koAugjVaLS9A+
 9uQoqEeVNTckxx0S2bYevRy7hGQmUJTyQm3j1zEUR5jpdbL83Fbq
------END RSA PRIVATE KEY-----"
-	pubkey_pem := "-----BEGIN RSA PUBLIC KEY-----
+-----END RSA PRIVATE KEY-----'
+	pubkey_pem := '-----BEGIN RSA PUBLIC KEY-----
 MIIBCgKCAQEA4f5wg5l2hKsTeNem/V41fGnJm6gOdrj8ym3rFkEU/wT8RDtnSgFE
 ZOQpHEgQ7JL38xUfU0Y3g6aYw9QT0hJ7mCpz9Er5qLaMXJwZxzHzAahlfA0icqab
 vJOMvQtzD6uQv6wPEyZtDTWiQi9AXwBpHssPnpYGIn20ZZuNlX2BrClciHhCPUII
 ZOQn/MmqTD31jSyjoQoV7MhhMTATKJx2XrHhR+1DcKJzQBSTAGnpYVaqpsARap+n
 wRipr3nUTuxyGohBTSmjJ2usSeQXHI3bODIRe1AuTyHceAbewn8b462yEWKARdpd
 9AjQW5SIVPfdsz5B6GlYQ5LdYKtznTuy7wIDAQAB
------END RSA PUBLIC KEY-----"
+-----END RSA PUBLIC KEY-----'
 
 	prikey := privkey_from_string(prikey_pem)!
 	pubkey := pubkey_from_string(pubkey_pem)!
@@ -93,15 +92,14 @@ wRipr3nUTuxyGohBTSmjJ2usSeQXHI3bODIRe1AuTyHceAbewn8b462yEWKARdpd
 	msg := 'test-message'.bytes()
 	label := 'test-label'.bytes()
 
-	enmsg := encrypt_for_oaep(pubkey.evpkey, "sha256", "sha256", msg, label)!
+	enmsg := encrypt_for_oaep(pubkey.evpkey, 'sha256', 'sha256', msg, label)!
 	assert enmsg.len > 0
 
-	demsg := decrypt_for_oaep(prikey.evpkey, "sha256", "sha256", enmsg, label)!
+	demsg := decrypt_for_oaep(prikey.evpkey, 'sha256', 'sha256', enmsg, label)!
 	assert msg.bytestr() == demsg.bytestr()
-
 }
 
-fn use_test_encrypt(bits int)! {
+fn use_test_encrypt(bits int) ! {
 	mut pubkey, prikey := generate_key(bits)!
 
 	msg := 'test-message'.bytes()
@@ -111,7 +109,6 @@ fn use_test_encrypt(bits int)! {
 
 	demsg := decrypt(prikey.evpkey, enmsg)!
 	assert msg.bytestr() == demsg.bytestr()
-
 }
 
 fn test_encrypt_with_bits() {
@@ -119,21 +116,19 @@ fn test_encrypt_with_bits() {
 	use_test_encrypt(1024)!
 	use_test_encrypt(2048)!
 	use_test_encrypt(4098)!
-
 }
 
-fn use_test_encrypt_for_oaep(bits int)! {
+fn use_test_encrypt_for_oaep(bits int) ! {
 	mut pubkey, prikey := generate_key(bits)!
 
 	msg := 'test-message'.bytes()
 	label := 'test-label'.bytes()
 
-	enmsg := encrypt_for_oaep(pubkey.evpkey, "sha256", "sha256", msg, label)!
+	enmsg := encrypt_for_oaep(pubkey.evpkey, 'sha256', 'sha256', msg, label)!
 	assert enmsg.len > 0
 
-	demsg := decrypt_for_oaep(prikey.evpkey, "sha256", "sha256", enmsg, label)!
+	demsg := decrypt_for_oaep(prikey.evpkey, 'sha256', 'sha256', enmsg, label)!
 	assert msg.bytestr() == demsg.bytestr()
-
 }
 
 fn test_encrypt_for_oaep_with_bits() {
@@ -141,5 +136,4 @@ fn test_encrypt_for_oaep_with_bits() {
 	use_test_encrypt_for_oaep(1024)!
 	use_test_encrypt_for_oaep(2048)!
 	use_test_encrypt_for_oaep(4098)!
-
 }

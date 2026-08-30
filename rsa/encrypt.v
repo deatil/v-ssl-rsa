@@ -4,34 +4,36 @@ fn encrypt(key &C.EVP_PKEY, msg []u8) ![]u8 {
 	ctx := C.EVP_PKEY_CTX_new(key, 0)
 	if ctx == 0 {
 		C.EVP_PKEY_CTX_free(ctx)
-		return error('EVP_PKEY_CTX_new failed')
+		return rsa_error('EVP_PKEY_CTX_new failed')
 	}
 
-	en := C.EVP_PKEY_encrypt_init(ctx)
-	if en != 1 {
+	mut status := i32(0)
+
+	status = C.EVP_PKEY_encrypt_init(ctx)
+	if status != 1 {
 		C.EVP_PKEY_CTX_free(ctx)
-		return error('EVP_PKEY_encrypt_init failed')
+		return rsa_error('EVP_PKEY_encrypt_init failed')
 	}
 
-	err := C.EVP_PKEY_CTX_set_rsa_padding(ctx, C.RSA_PKCS1_PADDING)
-	if err <= 0 {
+	status = C.EVP_PKEY_CTX_set_rsa_padding(ctx, C.RSA_PKCS1_PADDING)
+	if status <= 0 {
 		C.EVP_PKEY_CTX_free(ctx)
-		return error('EVP_PKEY_CTX_set_rsa_padding fails')
+		return rsa_error('EVP_PKEY_CTX_set_rsa_padding fails')
 	}
 
 	outlen := i32(0)
-	do := C.EVP_PKEY_encrypt(ctx, voidptr(0), &outlen, msg.data, msg.len)
-	if do <= 0 {
+	status = C.EVP_PKEY_encrypt(ctx, unsafe { nil }, &outlen, msg.data, msg.len)
+	if status <= 0 {
 		C.EVP_PKEY_CTX_free(ctx)
-		return error('EVP_PKEY_encrypt fails to get outlen')
+		return rsa_error('EVP_PKEY_encrypt fails to get outlen')
 	}
 
 	out := []u8{len: int(outlen)}
-	do2 := C.EVP_PKEY_encrypt(ctx, out.data, &outlen, msg.data, msg.len)
-	if do2 <= 0 {
+	status = C.EVP_PKEY_encrypt(ctx, out.data, &outlen, msg.data, msg.len)
+	if status <= 0 {
 		unsafe { out.free() }
 		C.EVP_PKEY_CTX_free(ctx)
-		return error('EVP_PKEY_encrypt fails to encrypt message')
+		return rsa_error('EVP_PKEY_encrypt fails to encrypt message')
 	}
 
 	out_data := out[0..outlen].clone()
@@ -48,33 +50,35 @@ fn decrypt(key &C.EVP_PKEY, ciphertext []u8) ![]u8 {
 	ctx := C.EVP_PKEY_CTX_new(key, 0)
 	if ctx == 0 {
 		C.EVP_PKEY_CTX_free(ctx)
-		return error('EVP_PKEY_CTX_new failed')
+		return rsa_error('EVP_PKEY_CTX_new failed')
 	}
 
-	dinit := C.EVP_PKEY_decrypt_init(ctx)
-	if dinit != 1 {
+	mut status := i32(0)
+
+	status = C.EVP_PKEY_decrypt_init(ctx)
+	if status != 1 {
 		C.EVP_PKEY_CTX_free(ctx)
-		return error('EVP_PKEY_decrypt_init failed')
+		return rsa_error('EVP_PKEY_decrypt_init failed')
 	}
 
-	err := C.EVP_PKEY_CTX_set_rsa_padding(ctx, C.RSA_PKCS1_PADDING)
-	if err <= 0 {
+	status = C.EVP_PKEY_CTX_set_rsa_padding(ctx, C.RSA_PKCS1_PADDING)
+	if status <= 0 {
 		C.EVP_PKEY_CTX_free(ctx)
-		return error('EVP_PKEY_CTX_set_rsa_padding fails')
+		return rsa_error('EVP_PKEY_CTX_set_rsa_padding fails')
 	}
 
 	outlen := i32(0)
-	do := C.EVP_PKEY_decrypt(ctx, voidptr(0), &outlen, ciphertext.data, ciphertext.len)
-	if do <= 0 {
+	status = C.EVP_PKEY_decrypt(ctx, unsafe { nil }, &outlen, ciphertext.data, ciphertext.len)
+	if status <= 0 {
 		C.EVP_PKEY_CTX_free(ctx)
-		return error('EVP_PKEY_decrypt fails to get outlen')
+		return rsa_error('EVP_PKEY_decrypt fails to get outlen')
 	}
 
 	out := []u8{len: outlen}
-	res := C.EVP_PKEY_decrypt(ctx, out.data, &outlen, ciphertext.data, ciphertext.len)
-	if res <= 0 {
+	status = C.EVP_PKEY_decrypt(ctx, out.data, &outlen, ciphertext.data, ciphertext.len)
+	if status <= 0 {
 		C.EVP_PKEY_CTX_free(ctx)
-		return error('EVP_PKEY_decrypt fails to decrypt ciphertext')
+		return rsa_error('EVP_PKEY_decrypt fails to decrypt ciphertext')
 	}
 
 	out_data := out[0..outlen].clone()
@@ -91,54 +95,56 @@ fn encrypt_for_oaep(key &C.EVP_PKEY, hash_name string, mgf_hash_name string, msg
 	ctx := C.EVP_PKEY_CTX_new(key, 0)
 	if ctx == 0 {
 		C.EVP_PKEY_CTX_free(ctx)
-		return error('EVP_PKEY_CTX_new failed')
+		return rsa_error('EVP_PKEY_CTX_new failed')
 	}
 
-	en := C.EVP_PKEY_encrypt_init(ctx)
-	if en != 1 {
+	mut status := i32(0)
+
+	status = C.EVP_PKEY_encrypt_init(ctx)
+	if status != 1 {
 		C.EVP_PKEY_CTX_free(ctx)
-		return error('EVP_PKEY_encrypt_init failed')
+		return rsa_error('EVP_PKEY_encrypt_init failed')
 	}
 
-	mut err := C.EVP_PKEY_CTX_set_rsa_padding(ctx, C.RSA_PKCS1_OAEP_PADDING)
-	if err <= 0 {
+	status = C.EVP_PKEY_CTX_set_rsa_padding(ctx, C.RSA_PKCS1_OAEP_PADDING)
+	if status <= 0 {
 		C.EVP_PKEY_CTX_free(ctx)
-		return error('EVP_PKEY_CTX_set_rsa_padding fails')
+		return rsa_error('EVP_PKEY_CTX_set_rsa_padding fails')
 	}
 
 	md := get_md_with_mdname(hash_name)!
-	err = C.EVP_PKEY_CTX_set_rsa_oaep_md(ctx, md)
-	if err <= 0 {
+	status = C.EVP_PKEY_CTX_set_rsa_oaep_md(ctx, md)
+	if status <= 0 {
 		C.EVP_PKEY_CTX_free(ctx)
-		return error('EVP_PKEY_CTX_set_rsa_oaep_md fails')
+		return rsa_error('EVP_PKEY_CTX_set_rsa_oaep_md fails')
 	}
 
 	mgf_md := get_md_with_mdname(mgf_hash_name)!
-	err = C.EVP_PKEY_CTX_set_rsa_mgf1_md(ctx, mgf_md)
-	if err <= 0 {
+	status = C.EVP_PKEY_CTX_set_rsa_mgf1_md(ctx, mgf_md)
+	if status <= 0 {
 		C.EVP_PKEY_CTX_free(ctx)
-		return error('EVP_PKEY_CTX_set_rsa_mgf1_md fails')
+		return rsa_error('EVP_PKEY_CTX_set_rsa_mgf1_md fails')
 	}
 
 	dup_label := C.OPENSSL_memdup(label.data, label.len)
-	err = C.EVP_PKEY_CTX_set0_rsa_oaep_label(ctx, dup_label, label.len)
-	if err <= 0 {
+	status = C.EVP_PKEY_CTX_set0_rsa_oaep_label(ctx, dup_label, label.len)
+	if status <= 0 {
 		C.EVP_PKEY_CTX_free(ctx)
-		return error('EVP_PKEY_CTX_set0_rsa_oaep_label fails')
+		return rsa_error('EVP_PKEY_CTX_set0_rsa_oaep_label fails')
 	}
 
 	outlen := i32(0)
-	do := C.EVP_PKEY_encrypt(ctx, voidptr(0), &outlen, msg.data, msg.len)
-	if do <= 0 {
+	status = C.EVP_PKEY_encrypt(ctx, unsafe { nil }, &outlen, msg.data, msg.len)
+	if status <= 0 {
 		C.EVP_PKEY_CTX_free(ctx)
-		return error('EVP_PKEY_encrypt fails to get outlen')
+		return rsa_error('EVP_PKEY_encrypt fails to get outlen')
 	}
 
 	out := []u8{len: int(outlen)}
-	res := C.EVP_PKEY_encrypt(ctx, out.data, &outlen, msg.data, msg.len)
-	if res <= 0 {
+	status = C.EVP_PKEY_encrypt(ctx, out.data, &outlen, msg.data, msg.len)
+	if status <= 0 {
 		C.EVP_PKEY_CTX_free(ctx)
-		return error('EVP_PKEY_encrypt fails to encrypt message')
+		return rsa_error('EVP_PKEY_encrypt fails to encrypt message')
 	}
 
 	out_data := out[0..outlen].clone()
@@ -155,54 +161,56 @@ fn decrypt_for_oaep(key &C.EVP_PKEY, hash_name string, mgf_hash_name string, cip
 	ctx := C.EVP_PKEY_CTX_new(key, 0)
 	if ctx == 0 {
 		C.EVP_PKEY_CTX_free(ctx)
-		return error('EVP_PKEY_CTX_new failed')
+		return rsa_error('EVP_PKEY_CTX_new failed')
 	}
 
-	dinit := C.EVP_PKEY_decrypt_init(ctx)
-	if dinit != 1 {
+	mut status := i32(0)
+
+	status = C.EVP_PKEY_decrypt_init(ctx)
+	if status != 1 {
 		C.EVP_PKEY_CTX_free(ctx)
-		return error('EVP_PKEY_decrypt_init failed')
+		return rsa_error('EVP_PKEY_decrypt_init failed')
 	}
 
-	mut err := C.EVP_PKEY_CTX_set_rsa_padding(ctx, C.RSA_PKCS1_OAEP_PADDING)
-	if err <= 0 {
+	status = C.EVP_PKEY_CTX_set_rsa_padding(ctx, C.RSA_PKCS1_OAEP_PADDING)
+	if status <= 0 {
 		C.EVP_PKEY_CTX_free(ctx)
-		return error('EVP_PKEY_CTX_set_rsa_padding fails')
+		return rsa_error('EVP_PKEY_CTX_set_rsa_padding fails')
 	}
 
 	md := get_md_with_mdname(hash_name)!
-	err = C.EVP_PKEY_CTX_set_rsa_oaep_md(ctx, md)
-	if err <= 0 {
+	status = C.EVP_PKEY_CTX_set_rsa_oaep_md(ctx, md)
+	if status <= 0 {
 		C.EVP_PKEY_CTX_free(ctx)
-		return error('EVP_PKEY_CTX_set_rsa_oaep_md fails')
+		return rsa_error('EVP_PKEY_CTX_set_rsa_oaep_md fails')
 	}
 
 	mgf_md := get_md_with_mdname(mgf_hash_name)!
-	err = C.EVP_PKEY_CTX_set_rsa_mgf1_md(ctx, mgf_md)
-	if err <= 0 {
+	status = C.EVP_PKEY_CTX_set_rsa_mgf1_md(ctx, mgf_md)
+	if status <= 0 {
 		C.EVP_PKEY_CTX_free(ctx)
-		return error('EVP_PKEY_CTX_set_rsa_mgf1_md fails')
+		return rsa_error('EVP_PKEY_CTX_set_rsa_mgf1_md fails')
 	}
 
 	dup_label := C.OPENSSL_memdup(label.data, label.len)
-	err = C.EVP_PKEY_CTX_set0_rsa_oaep_label(ctx, dup_label, label.len)
-	if err <= 0 {
+	status = C.EVP_PKEY_CTX_set0_rsa_oaep_label(ctx, dup_label, label.len)
+	if status <= 0 {
 		C.EVP_PKEY_CTX_free(ctx)
-		return error('EVP_PKEY_CTX_set0_rsa_oaep_label fails')
+		return rsa_error('EVP_PKEY_CTX_set0_rsa_oaep_label fails')
 	}
 
 	outlen := i32(0)
-	do := C.EVP_PKEY_decrypt(ctx, voidptr(0), &outlen, ciphertext.data, ciphertext.len)
-	if do <= 0 {
+	status = C.EVP_PKEY_decrypt(ctx, unsafe { nil }, &outlen, ciphertext.data, ciphertext.len)
+	if status <= 0 {
 		C.EVP_PKEY_CTX_free(ctx)
-		return error('EVP_PKEY_decrypt fails to get outlen')
+		return rsa_error('EVP_PKEY_decrypt fails to get outlen')
 	}
 
 	out := []u8{len: outlen}
-	res := C.EVP_PKEY_decrypt(ctx, out.data, &outlen, ciphertext.data, ciphertext.len)
-	if res <= 0 {
+	status = C.EVP_PKEY_decrypt(ctx, out.data, &outlen, ciphertext.data, ciphertext.len)
+	if status <= 0 {
 		C.EVP_PKEY_CTX_free(ctx)
-		return error('EVP_PKEY_decrypt fails to decrypt ciphertext')
+		return rsa_error('EVP_PKEY_decrypt fails to decrypt ciphertext')
 	}
 
 	out_data := out[0..outlen].clone()
@@ -214,4 +222,3 @@ fn decrypt_for_oaep(key &C.EVP_PKEY, hash_name string, mgf_hash_name string, cip
 
 	return out_data
 }
-

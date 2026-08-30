@@ -17,13 +17,15 @@ pub fn PrivateKey.new(bits int, primes int) !PrivateKey {
 	pctx := C.EVP_PKEY_CTX_new_id(nid_evp_pkey_rsa, 0)
 	if pctx == 0 {
 		C.EVP_PKEY_CTX_free(pctx)
-		return error('C.EVP_PKEY_CTX_new_id failed')
+		return rsa_error('EVP_PKEY_CTX_new_id failed')
 	}
 
-	nt := C.EVP_PKEY_keygen_init(pctx)
-	if nt <= 0 {
+	mut status := i32(0)
+
+	status = C.EVP_PKEY_keygen_init(pctx)
+	if status <= 0 {
 		C.EVP_PKEY_CTX_free(pctx)
-		return error('EVP_PKEY_keygen_init failed')
+		return rsa_error('EVP_PKEY_keygen_init failed')
 	}
 
 	C.EVP_PKEY_CTX_set_rsa_keygen_bits(pctx, bits)
@@ -31,11 +33,11 @@ pub fn PrivateKey.new(bits int, primes int) !PrivateKey {
 
 	evpkey := C.EVP_PKEY_new()
 
-	nr := C.EVP_PKEY_keygen(pctx, &evpkey)
-	if nr <= 0 {
+	status = C.EVP_PKEY_keygen(pctx, &evpkey)
+	if status <= 0 {
 		C.EVP_PKEY_free(evpkey)
 		C.EVP_PKEY_CTX_free(pctx)
-		return error('EVP_PKEY_keygen failed')
+		return rsa_error('EVP_PKEY_keygen failed')
 	}
 
 	C.EVP_PKEY_CTX_free(pctx)
@@ -51,11 +53,16 @@ pub fn PrivateKey.new(bits int, primes int) !PrivateKey {
 pub fn (pv PrivateKey) public() !PublicKey {
 	// Using duplicate key and removes (clears out) priv key
 	pbkey := C.EVP_PKEY_dup(pv.evpkey)
+
 	bn := C.BN_new()
-	n := C.EVP_PKEY_set_bn_param(pbkey, c'priv', bn)
-	assert n == 1
-	// cleansup
+	status := C.EVP_PKEY_set_bn_param(pbkey, c'priv', bn)
+	if status <= 0 {
+		C.BN_free(bn)
+		return rsa_error('EVP_PKEY_keygen failed')
+	}
+
 	C.BN_free(bn)
+
 	return PublicKey{
 		evpkey: pbkey
 	}
@@ -93,5 +100,3 @@ pub fn (pb PublicKey) size() int {
 pub fn (pb &PublicKey) free() {
 	C.EVP_PKEY_free(pb.evpkey)
 }
-
-

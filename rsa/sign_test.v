@@ -12,12 +12,11 @@ fn test_sign_digest() {
 	d.write(msg)!
 	digest := d.sum([])
 
-	sig := sign_digest(prikey.evpkey, "sha256", digest)!
+	sig := sign_digest(prikey.evpkey, 'sha256', digest)!
 	assert sig.len > 0
 
-	veri := verify_signature(pubkey.evpkey, "sha256", sig, digest)
+	veri := verify_signature(pubkey.evpkey, 'sha256', sig, digest)
 	assert true == veri
-
 }
 
 fn test_sign_digest_pss() {
@@ -30,10 +29,9 @@ fn test_sign_digest_pss() {
 	d.write(msg)!
 	digest := d.sum([])
 
-	sig := sign_digest_pss(prikey.evpkey, "sha256", -1, digest)!
+	sig := sign_digest_pss(prikey.evpkey, 'sha256', -1, digest)!
 	assert sig.len > 0
 
-	veri := verify_signature_pss(pubkey.evpkey, "sha256", pss_salt_length_auto, sig, digest)
+	veri := verify_signature_pss(pubkey.evpkey, 'sha256', pss_salt_length_auto, sig, digest)
 	assert true == veri
 }
-

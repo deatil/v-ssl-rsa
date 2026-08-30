@@ -14,13 +14,13 @@ fn test_sign_pss() {
 
 	sig := sign_pss(prikey, digest, PSSOptions{
 		salt_leng: -1
-		hash_name: "sha256"
+		hash_name: 'sha256'
 	})!
 	assert sig.len > 0
 
 	veri := verify_pss(pubkey, digest, sig, PSSOptions{
 		salt_leng: pss_salt_length_auto
-		hash_name: "sha256"
+		hash_name: 'sha256'
 	})
 	assert true == veri
 }
