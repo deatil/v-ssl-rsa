@@ -127,8 +127,7 @@ pub fn make_privkey_pem(prikey PrivateKey) !string {
 	}
 
 	kstr := []u8{}
-	n := C.PEM_write_bio_PrivateKey(bo, prikey.evpkey, unsafe { nil }, kstr.data, 0,
-		unsafe { nil }, unsafe { nil })
+	n := C.PEM_write_bio_PrivateKey(bo, prikey.evpkey, unsafe { nil }, kstr.data, 0, unsafe { nil }, unsafe { nil })
 	if n <= 0 {
 		C.BIO_free_all(bo)
 		return rsa_error('PEM_write_bio_PrivateKey failed')
@@ -166,10 +165,12 @@ pub fn make_privkey_pkcs1_pem(prikey PrivateKey) !string {
 	}
 
 	pem_bytes := []u8{len: int(n)}
+
 	unsafe {
 		C.memcpy(&pem_bytes[0], buf, n)
 		C.OPENSSL_free(buf)
 	}
+
 	return encode_pem('RSA PRIVATE KEY', pem_bytes)
 }
 
@@ -183,25 +184,12 @@ pub fn make_pubkey_pkcs1_pem(pubkey PublicKey) !string {
 	}
 
 	pem_bytes := []u8{len: int(n)}
+
 	unsafe {
 		C.memcpy(&pem_bytes[0], buf, n)
 		C.OPENSSL_free(buf)
 	}
+
 	return encode_pem('RSA PUBLIC KEY', pem_bytes)
 }
 
-fn bio_to_bytes(bio &C.BIO) ![]u8 {
-	siz := C.BIO_pending(bio)
-	if siz < 0 {
-		return rsa_error('BIO_pending failed')
-	}
-
-	buf := []u8{len: siz}
-	status := C.BIO_read(bio, buf.data, siz)
-	if status < 0 {
-		unsafe { buf.free() }
-		return rsa_error('BIO_read failed')
-	}
-
-	return buf
-}

@@ -104,3 +104,19 @@ fn get_md_with_mdname(name string) !&C.EVP_MD {
 
 	return md
 }
+
+fn bio_to_bytes(bio &C.BIO) ![]u8 {
+	siz := C.BIO_pending(bio)
+	if siz < 0 {
+		return rsa_error('BIO_pending failed')
+	}
+
+	buf := []u8{len: siz}
+	status := C.BIO_read(bio, buf.data, siz)
+	if status < 0 {
+		unsafe { buf.free() }
+		return rsa_error('BIO_read failed')
+	}
+
+	return buf
+}

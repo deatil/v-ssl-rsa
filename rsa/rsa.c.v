@@ -37,8 +37,7 @@ module rsa
 #include <openssl/param_build.h>
 
 fn C.ERR_get_error() u64
-fn C.ERR_error_string(u64, &u8) &u8
-fn C.ERR_lib_error_string(u64) &u8
+fn C.ERR_error_string(e u64, buf &u8) &u8
 
 fn C.OPENSSL_memdup(str &u8, siz int) &u8
 fn C.OPENSSL_free(addr voidptr)
