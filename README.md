@@ -49,7 +49,7 @@ fn main() {
 	digest := rsa.hash_msg(msg, 'sha256')!
 
 	signed := rsa.sign_pkcs1v15(prikey, "sha256", digest)!
-    println("sign_pkcs1v15: ${signed}")
+    println("sign_pkcs1v15: ${signed.hex()}")
 
 	veri := rsa.verify_pkcs1v15(pubkey, "sha256", digest, signed)
 	println("verify_pkcs1v15: ${veri}")
