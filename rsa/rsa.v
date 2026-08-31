@@ -6,6 +6,16 @@ const nid_rsa_publickey = C.EVP_PKEY_RSA
 // https://docs.openssl.org/3.0/man3/EVP_PKEY_fromdata/#selections
 const evp_pkey_keypair = C.EVP_PKEY_KEYPAIR
 
+@[params]
+pub struct GenerateOptions {
+pub:
+	// bit size
+	bits int = 1024
+
+	// rsa multi prime
+	primes int = 2
+}
+
 pub struct PrivateKey {
 	// The new high level of keypair opaque
 	evpkey &C.EVP_PKEY
@@ -13,7 +23,7 @@ pub struct PrivateKey {
 
 // PrivateKey.new creates a new key pair.
 // Dont forget to call `.free()` after finish with your key.
-pub fn PrivateKey.new(bits int, primes int) !PrivateKey {
+pub fn PrivateKey.new(opts GenerateOptions) !PrivateKey {
 	pctx := C.EVP_PKEY_CTX_new_id(nid_evp_pkey_rsa, 0)
 	if pctx == 0 {
 		C.EVP_PKEY_CTX_free(pctx)
@@ -28,8 +38,17 @@ pub fn PrivateKey.new(bits int, primes int) !PrivateKey {
 		return rsa_error('EVP_PKEY_keygen_init failed')
 	}
 
-	C.EVP_PKEY_CTX_set_rsa_keygen_bits(pctx, bits)
-	C.EVP_PKEY_CTX_set_rsa_keygen_primes(pctx, primes)
+	status = C.EVP_PKEY_CTX_set_rsa_keygen_bits(pctx, opts.bits)
+	if status <= 0 {
+		C.EVP_PKEY_CTX_free(pctx)
+		return rsa_error('EVP_PKEY_CTX_set_rsa_keygen_bits failed')
+	}
+
+	status = C.EVP_PKEY_CTX_set_rsa_keygen_primes(pctx, opts.primes)
+	if status <= 0 {
+		C.EVP_PKEY_CTX_free(pctx)
+		return rsa_error('EVP_PKEY_CTX_set_rsa_keygen_primes failed')
+	}
 
 	evpkey := C.EVP_PKEY_new()
 

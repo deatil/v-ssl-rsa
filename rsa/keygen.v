@@ -12,7 +12,10 @@ pub fn generate_key(bits int) !(PublicKey, PrivateKey) {
 // private keys in certain formats or to subsequently import them into other
 // code.
 pub fn generate_multi_prime_key(bits int, primes int) !(PublicKey, PrivateKey) {
-	pv := PrivateKey.new(bits, primes)!
+	pv := PrivateKey.new(GenerateOptions{
+		bits:   bits
+		primes: primes
+	})!
 	pb := pv.public()!
 
 	return pb, pv
